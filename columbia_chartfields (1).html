@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Finance · Chartfield Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Calibri:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#e6e6e6;--page:#fff;--border:#c8d5e6;--bc:#c0c8d4;
+  --text:#222;--muted:#666;--navy:#1e3a6e;--gold:#c8920a;
+  --green-h:#e2f0e2;--green-b:#7ab87a;--orange-h:#fde8cc;--orange-t:#8b4a00;
+  --odd:#fff;--even:#f2f2f2;--hover:#dce6f0;--sec-bg:#f8f8f8;--panel-w:252px;
+}
+body{background:var(--bg);font-family:'Calibri',Arial,sans-serif;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+
+/* ── PANEL ── */
+.side-panel{width:var(--panel-w);min-width:var(--panel-w);background:var(--navy);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.panel-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.panel-logo-main{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#fff;text-transform:uppercase;letter-spacing:.5px;line-height:1}
+.panel-logo-sub{font-size:10.5px;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.4}
+.panel-sec-label{padding:14px 18px 6px;font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
+.pnav{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:12.5px;color:rgba(255,255,255,.72);cursor:pointer;transition:all .15s;border:none;background:none;text-align:left;width:100%;font-family:'Calibri',Arial,sans-serif;border-left:3px solid transparent}
+.pnav:hover{background:rgba(255,255,255,.08);color:#fff}
+.pnav.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:var(--gold);font-weight:700}
+.pnav .nc{font-size:10px;color:rgba(255,255,255,.3);margin-left:auto;white-space:nowrap}
+.pdiv{height:1px;background:rgba(255,255,255,.1);margin:6px 18px}
+.panel-footer{margin-top:auto;padding:12px 18px;font-size:10px;color:rgba(255,255,255,.28);border-top:1px solid rgba(255,255,255,.1);line-height:1.5}
+
+/* ── MAIN ── */
+.main-content{flex:1;padding:24px 26px 60px;overflow-x:hidden;min-width:0}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.toolbar button{background:var(--navy);color:#fff;border:none;padding:7px 18px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;transition:background .15s}
+.toolbar button:hover{background:#26508a}
+.search-wrap{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #c8d5e6;border-radius:4px;padding:5px 11px;flex:1;min-width:180px;max-width:320px}
+.search-wrap input{border:none;outline:none;font-family:inherit;font-size:13px;color:var(--text);background:transparent;width:100%}
+.search-wrap input::placeholder{color:var(--muted)}
+
+/* ── PAGE CARDS ── */
+.page-card{background:var(--page);padding:0 0 28px;box-shadow:0 14px 40px rgba(24,55,101,.13);border:1px solid var(--border);display:none}
+.page-card.active{display:block}
+
+/* ── TITLE BARS ── */
+.tbl-title{background:var(--navy);color:#fff;font-weight:700;font-size:12.5px;letter-spacing:1.2px;text-align:center;padding:9px 8px;text-transform:uppercase}
+.tbl-subtitle{background:#fff;color:var(--navy);font-weight:700;font-size:12px;text-align:center;padding:7px 8px;border-bottom:1px solid var(--bc)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table.itbl{width:100%;border-collapse:collapse;font-family:'Calibri',Arial,sans-serif;table-layout:fixed}
+
+/* column header */
+th.col-th{background:var(--navy);color:#fff;font-weight:700;font-size:11px;padding:0;border:1px solid #2a4f8a;position:relative;user-select:none;white-space:nowrap;cursor:grab}
+th.col-th.drag-over{background:#2a5fa0;outline:2px dashed rgba(255,255,255,.5)}
+th.col-th.dragging{opacity:.4}
+.th-inner{display:flex;align-items:center;gap:4px;padding:8px 30px 8px 10px;min-height:36px;cursor:pointer}
+.th-label{flex:1;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.th-sort{font-size:10px;opacity:.7;flex-shrink:0;color:#fff}
+.th-filter-btn{position:absolute;right:5px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.2);border:none;color:#fff;width:19px;height:19px;border-radius:3px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:background .12s;padding:0;line-height:1}
+.th-filter-btn:hover,.th-filter-btn.open{background:rgba(255,255,255,.38)}
+.th-filter-btn.has-filter{background:var(--gold);color:#fff}
+
+/* ── FILTER DROPDOWN ── */
+.filter-drop{position:absolute;top:calc(100% + 2px);left:0;z-index:9999;background:#fff;border:1.5px solid #aab8cc;border-radius:6px;box-shadow:0 8px 28px rgba(0,0,0,.22);min-width:210px;max-width:300px;padding:10px;display:none}
+.filter-drop.open{display:block}
+/* search inside dropdown */
+.filter-drop input[type=text]{width:100%;border:1px solid var(--bc);border-radius:4px;padding:5px 8px;font-size:12px;font-family:inherit;outline:none;color:#111;background:#fff;margin-bottom:7px}
+.filter-drop input[type=text]:focus{border-color:var(--navy)}
+.fd-opts{max-height:180px;overflow-y:auto;font-size:12px;color:#111}
+.fd-opt{display:flex;align-items:center;gap:7px;padding:4px 3px;cursor:pointer;color:#111;border-radius:3px}
+.fd-opt:hover{background:#eef2f8}
+.fd-opt input[type=checkbox]{accent-color:var(--navy);cursor:pointer;flex-shrink:0;width:14px;height:14px}
+.fd-opt span{color:#111;font-size:12px;line-height:1.4}
+.fd-actions{display:flex;gap:6px;margin-top:8px;border-top:1px solid var(--border);padding-top:8px}
+.fd-btn{flex:1;padding:6px 0;font-size:12px;font-family:inherit;border:none;border-radius:4px;cursor:pointer;font-weight:600}
+.fd-btn.apply{background:var(--navy);color:#fff}
+.fd-btn.apply:hover{background:#26508a}
+.fd-btn.clear{background:#e8e8e8;color:#333;border:1px solid #ccc}
+.fd-btn.clear:hover{background:#d8d8d8;color:#111}
+.fd-sort-btns{display:flex;gap:6px;margin-bottom:8px}
+.fd-sort-btn{flex:1;padding:5px 0;font-size:11px;font-family:inherit;border:1px solid var(--bc);border-radius:4px;cursor:pointer;background:#f0f0f0;color:#333;transition:all .12s;font-weight:600}
+.fd-sort-btn:hover{background:#dde4ef;color:var(--navy)}
+.fd-sort-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── DATA ROWS ── */
+td.cell{padding:6px 10px;border:1px solid var(--bc);font-size:11.5px;color:var(--text);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.cell.def-cell{white-space:normal;font-size:11px;color:#444}
+tr.drow{transition:background .08s}
+tr.drow:nth-child(odd) td{background:var(--odd)}
+tr.drow:nth-child(even) td{background:var(--even)}
+tr.drow:hover td{background:var(--hover)!important}
+tr.drow.hidden{display:none}
+
+/* section rows */
+tr.row-section td{font-weight:700;font-size:11.5px;padding:6px 10px;border:1px solid var(--bc);color:var(--navy);background:var(--sec-bg);letter-spacing:.15px}
+tr.row-section.green td{background:var(--green-h);color:#1a5c28;border-color:var(--green-b)}
+tr.row-section.orange td{background:var(--orange-h);color:var(--orange-t);border-color:#d4924a}
+tr.row-spacer td{background:var(--page);height:8px;border-left:1.5px solid var(--bc);border-right:1.5px solid var(--bc);border-bottom:none;border-top:none;padding:0}
+tr.row-warning td{padding:6px 10px;font-size:10.5px;color:#7a3a00;font-style:italic;border:1px solid var(--bc);background:#fde8cc}
+
+.no-results{text-align:center;padding:26px;color:var(--muted);font-style:italic;display:none}
+@media print{.side-panel,.toolbar{display:none!important}.main-content{padding:0}.page-card{box-shadow:none;border:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDE PANEL -->
+<nav class="side-panel">
+  <div class="panel-logo">
+    <div class="panel-logo-main">Finance · Chartfield Reference</div>
+  </div>
+  <div class="panel-sec-label">Chartfields</div>
+  <button class="pnav active" onclick="showPage('nat',this)"><span>📋</span> Natural Accounts</button>
+  <button class="pnav" onclick="showPage('init',this)"><span>🎯</span> Initiative <span class="nc">2xxxx/4xxxx</span></button>
+  <button class="pnav" onclick="showPage('seg',this)"><span>🏷</span> Segment <span class="nc">52000xxx</span></button>
+  <div class="pdiv"></div>
+  <div class="panel-sec-label">Transaction Context</div>
+  <button class="pnav" onclick="showPage('vtype',this)"><span>🧾</span> Voucher Type</button>
+  <button class="pnav" onclick="showPage('src',this)"><span>⚙️</span> Source</button>
+  <button class="pnav" onclick="showPage('cob',this)"><span>📊</span> COB Lines</button>
+  <div class="panel-footer">Internal Use Only<br>Balance Sheet accts (1/2/3xx):<br>Consult Dean's Office</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-content">
+  <div class="toolbar">
+    <button onclick="window.print()">⬇ Print / Save PDF</button>
+    <div class="search-wrap">
+      <span style="color:var(--navy)">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search code or name…" oninput="filterActive()"/>
+    </div>
+    <span id="resetHint" style="display:none">
+      <button onclick="resetAll()" style="background:#e8f0fb;color:var(--navy);border:1px solid var(--border);padding:5px 12px;border-radius:4px;font-size:11px;cursor:pointer;font-family:inherit">↺ Reset Filters & Order</button>
+    </span>
+  </div>
+
+  <div class="page-card active" id="page-nat">
+    <div class="tbl-title">COMMONLY USED NATURAL ACCOUNTS</div>
+    <div class="tbl-subtitle">What exactly is being purchased or earned?</div>
+    <div id="nat-container"></div>
+    <div class="no-results" id="nat-noresults">No accounts match your search.</div>
+  </div>
+
+  <div class="page-card" id="page-seg">
+    <div class="tbl-title">Columbia Engineering Most Common Segments</div>
+    <div class="tbl-subtitle">Who or what is this expense support specifically?</div>
+    <div id="seg-container"></div>
+    <div class="no-results" id="seg-noresults">No segments match your search.</div>
+  </div>
+
+  <div class="page-card" id="page-init">
+    <div class="tbl-title">Columbia Engineering Common Initiatives</div>
+    <div class="tbl-subtitle">Which institutional activity or purpose does the transaction support?</div>
+    <div id="init-container"></div>
+    <div class="no-results" id="init-noresults">No initiatives match your search.</div>
+  </div>
+
+  <div class="page-card" id="page-vtype">
+    <div class="tbl-title">Voucher Types</div>
+    <div class="tbl-subtitle">What type of payment or transaction is this?</div>
+    <div id="vtype-container"></div>
+    <div class="no-results" id="vtype-noresults">No voucher types match your search.</div>
+  </div>
+
+  <div class="page-card" id="page-src">
+    <div class="tbl-title">Source</div>
+    <div class="tbl-subtitle">Which accounting system, process, or workflow created this financial entry?</div>
+    <div id="src-container"></div>
+    <div class="no-results" id="src-noresults">No sources match your search.</div>
+  </div>
+
+  <div class="page-card" id="page-cob">
+    <div class="tbl-title">Columbia Engineering COB Line Glossary</div>
+    <div class="tbl-subtitle">Where does this transaction roll up on the Columbia Operating Budget report?</div>
+    <div id="cob-container"></div>
+    <div class="no-results" id="cob-noresults">No COB lines match your search.</div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// NAT ACCOUNTS DATA  — from Common_Accounts.pdf
+// cols: [acct#, name, category, type, definition]
+// ══════════════════════════════════════════════
+const NAT_SECTIONS=[
+  {key:'Supplies',label:'Supplies',rows:[
+    ['61405','SUPPLIES AND MATERIALS-GENERAL','Supplies & Materials','Expense','General supplies and materials used in operations.'],
+    ['61410','OFFICE SUPPLIES-GENERAL','Supplies & Materials','Expense','Office supplies such as paper, pens, and folders.'],
+    ['61500','LAB SUPPLIES-GENERAL','Supplies & Materials','Expense','General laboratory supplies used for experiments.'],
+    ['61690','FOOD-STAFF & FACULTY','Supplies & Materials','Expense','Food purchased for staff or faculty.'],
+    ['61670','DAIRY PRODUCTS','Supplies & Materials','Expense','Dairy product purchases.'],
+  ]},
+  {key:'Services',label:'Services',rows:[
+    ['64005','SERVICES - GENERAL','Services','Expense','General services purchased from vendors.'],
+    ['64050','FACILITIES SERVICES-GENERAL','Services','Expense','General facilities services expense.'],
+    ['64055','CU FACILITIES CHARGEABLE WORK','Services','Expense','Chargeable work performed by Columbia Facilities.'],
+    ['64110','LAB SERVICES','Services','Expense','Laboratory service charges.'],
+    ['64305','PHOTOGRAPHIC SERVICE','Services','Expense','Professional photography services.'],
+    ['64350','MEETINGS AND EVENTS','Services','Expense','Meeting and event costs.'],
+  ]},
+  {key:'Travel',label:'Travel',rows:[
+    ['65205','DOMESTIC TRAVEL-GENERAL','Domestic Travel','Expense','General domestic travel expense.'],
+    ['65210','DOMESTIC-TRANSPORTATION','Domestic Travel','Expense','Domestic transportation such as airfare, train, taxi, or rideshare.'],
+    ['65211','DOMESTIC-LOCAL TRANSPORTATION','Domestic Travel','Expense','Local transportation within the U.S.'],
+    ['65220','DOMESTIC-MEALS','Domestic Travel','Expense','Domestic meal expense.'],
+    ['65222','DOMESTIC-EXCESS OVER PER DEIM','Domestic Travel','Expense','Domestic meal cost above per diem allowance.'],
+    ['65230','DOMESTIC-LODGING','Domestic Travel','Expense','Domestic lodging expense.'],
+    ['65275','DOMESTIC-CONFERENCE FEES','Domestic Travel','Expense','Domestic conference registration fees.'],
+    ['65305','INTERNATIONAL TRAVEL-GENERAL','International Travel','Expense','General international travel expense.'],
+    ['65310','INTERNATIONAL-TRANSPORTATION','International Travel','Expense','International transportation expense.'],
+    ['65320','INTERNATIONAL-MEALS','International Travel','Expense','International meal expense.'],
+    ['65322','INTERNATIONAL-EXC OVER PER DEI','International Travel','Expense','International meals above per diem allowance.'],
+    ['65330','INTERNATIONAL-LODGING','International Travel','Expense','International lodging expense.'],
+    ['66475','TRAVEL SEGREGATED','Segregated Expenses','Expense','Travel expense tracked as segregated.'],
+  ]},
+  {key:'Food',label:'Food/Drink',rows:[
+    ['61690','FOOD-STAFF & FACULTY','Supplies & Materials','Expense','Food purchased for staff or faculty. Use for events where only staff and faculty are present.'],
+    ['66410','ALCOHOLIC BEVERAGES','Segregated Expenses','Expense','Alcoholic beverage expense.'],
+    ['61650','FOOD SUPPLIES GENERAL','Supplies & Materials','Expense','General food supplies.'],
+  ]},
+  {key:'Prizes',label:'Prizes/Awards/Gifts',rows:[
+    ['61200','STUDENT PRIZES / AWARDS','Non-tuition Financial Aid','Expense','Student prizes or awards.'],
+    ['66140','PRIZES /AWARD NONSTUDENTS','Other Expense','Expense','Prizes or awards paid to non-students.'],
+    ['64640','HONORARIUM','Consultants','Expense','Honorarium payments to guest speakers or contributors.'],
+    ['66430','FLOWERS','Segregated Expenses','Expense','Flower expense.'],
+  ]},
+  {key:'Equipment',label:'Equipment',rows:[
+    ['61910','MINOR EQUIPMENT-GENERAL','Minor Equipment','Expense','General minor equipment purchases not capitalized.'],
+    ['61925','MINOR EQUIPMENT-COMPUTERS','Minor Equipment','Expense','Purchase of smaller computer equipment.'],
+    ['61920','PRINTERS','Minor Equipment','Expense','Purchase of printers.'],
+    ['61950','MINOR FURNITURE-GENERAL','Minor Equipment','Expense','Purchase of minor furniture items.'],
+    ['68010','CAPITAL EQUIPMENT-GENERAL','Capital Equipment','Expense','General capital equipment purchase.'],
+    ['68020','CAPITAL SCIENTIFIC EQUIPMENT','Capital Equipment','Expense','Capital scientific equipment purchase.'],
+    ['68100','R&D COMPONENT PARTS-CAPITAL','Capital Equipment','Expense','Parts purchased to build capital research equipment.'],
+  ]},
+  {key:'Communications',label:'Communications',rows:[
+    ['63405','COMMUNICATIONS - GENERAL','Communications','Expense','General communications expense.'],
+    ['63410','COMMUNICATION CHARGES - CUIT','Communications','Expense','Telephone or communication charges.'],
+    ['63430','WIRELESS CHARGES - CUIT','Communications','Expense','Mobile phone service charges provided by CUIT.'],
+    ['63435','WIRELESS CHARGES - EXTERNAL','Communications','Expense','External wireless service charges.'],
+    ['63440','COMMUNICATION SERVICES','Communications','Expense','Various communication-related services.'],
+    ['66325','ADVERTISING','Segregated Expenses','Expense','Advertising expense.'],
+    ['66326','ADVERT - JOB VACANCY/RECRUIT','Segregated Expenses','Expense','Advertising for job vacancies or recruitment.'],
+    ['63205','COMPUTER USAGE CHARGE','Computer Software and Services','Expense','Charge for use of shared computer resources.'],
+    ['63210','DESKTOP SUPPORT-CUIT','Computer Software and Services','Expense','Desktop support services provided by CUIT.'],
+  ]},
+  {key:'CopierSoftware',label:'Copier / Software',rows:[
+    ['63290','COPIER MAINTENANCE','Computer Software and Services','Expense','Copier maintenance costs.'],
+    ['63292','COPIER PURCHASE','Computer Software and Services','Expense','Purchase of copiers.'],
+    ['63293','COPIER LEASE','Computer Software and Services','Expense','Lease payments for copiers.'],
+    ['63260','SOFTWARE PURCHASE','Computer Software and Services','Expense','Purchase of software packages or licenses.'],
+    ['63265','SOFTWARE LICENSE','Computer Software and Services','Expense','Software license fees.'],
+    ['63280','WEB EXPENSES','Computer Software and Services','Expense','Website-related expenses.'],
+  ]},
+  {key:'Consultants',label:'Consultants / Temp Help',rows:[
+    ['64505','CONSULTANTS-GENERAL','Consultants','Expense','General consulting expense.'],
+    ['64600','TEMP HELP','Consultants','Expense','Temporary help or staffing services.'],
+  ]},
+  {key:'Facilities',label:'Facilities',rows:[
+    ['64050','FACILITIES SERVICES-GENERAL','Services','Expense','General facilities services expense.'],
+    ['64055','CU FACILITIES CHARGEABLE WORK','Services','Expense','Chargeable work performed by Columbia Facilities.'],
+  ]},
+  {key:'Printing',label:'Printing Services',rows:[
+    ['62010','PUBLICATION COSTS-INTERNAL','Publications','Expense','Internal publication costs.'],
+    ['62015','PRINT SERVICES-INTERNAL','Publications','Expense','Internal print service charges.'],
+    ['62020','PRINTING COSTS','Publications','Expense','External printing costs.'],
+  ]},
+  {key:'Rentals',label:'Rentals',rows:[
+    ['63010','RENTAL - FACILITIES','Rentals','Expense','Rental of facilities or space.'],
+    ['63030','RENTAL - APARTMENT','Rentals','Expense','Apartment rental expense.'],
+    ['63100','LEASE PAYMENTS - FACILITIES','Rentals','Expense','Lease payments for facilities.'],
+  ]},
+  {key:'Shipping',label:'Shipping / Mailing Services',rows:[
+    ['63450','FREIGHT & PARCEL SHIPPING','Communications','Expense','Freight and parcel shipping costs.'],
+    ['63460','OVERNIGHT COURIER','Communications','Expense','Overnight courier charges.'],
+    ['63465','INTERNATIONAL COURIER','Communications','Expense','International courier charges.'],
+    ['63477','POSTAGE - DOMESTIC','Communications','Expense','Domestic postage expenses.'],
+  ]},
+  {key:'Subscriptions',label:'Subscriptions/Dues',rows:[
+    ['64330','SUBSCRIPTIONS','Services','Expense','Subscription expense.'],
+    ['64335','MEMBERSHIP COSTS','Services','Expense','Membership dues.'],
+  ]},
+  {key:'Other',label:'All Other',rows:[
+    ['65010','SUBCONTRACTS IN MTDC','Other Expense','Expense','Subcontracts included in MTDC base.'],
+    ['65020','SUBCONTRACTS OUT MTDC','Non-ICR Generating Exp','Expense','Subcontracts excluded from MTDC base.'],
+    ['66040','RELOCATION AND MOVING COSTS','Other Expense','Expense','Relocation and moving cost expense.'],
+  ]},
+  {key:'FinancialAid',label:'Financial Aid / Non-Tuition Financial Aid',rows:[
+    ['61030','GRADUATE TUITION AND FEES','Financial Aid Grants','Expense','Graduate tuition and required academic fees charged as financial aid.'],
+    ['61040','GRADUATE HEALTH FEES','Financial Aid Grants','Expense','Graduate health fees charged as financial aid.'],
+    ['61043','GRADUATE FEES-OTHER','Financial Aid Grants','Expense','Other graduate fees charged as financial aid.'],
+    ['61115','UNDERGRADUATE STIPENDS','Non-tuition Financial Aid','Expense','Undergraduate stipends awarded to students.'],
+    ['61140','GRADUATE STIPENDS','Non-tuition Financial Aid','Expense','Graduate stipends awarded to students.'],
+  ]},
+  {key:'Transfer',label:'Transfer of Funds',green:true,rows:[
+    ['75400 / 70400','GENERAL FUND TRANSFER','Transfers Within Fund Group','Indirect / Transfer','General fund transfer.'],
+    ['75435 / 70435','OD COVERAGE-SPON PROJ OD','Covering Ods on SPONS','Indirect / Transfer','OD coverage for sponsored projects.'],
+    ['75438 / 70438','SPON EXCESS INCOME TRANSFER','Excess Income from SPONS','Indirect / Transfer','Excess income transfer from sponsored projects.'],
+  ]},
+  {key:'Revenue',label:'Revenues',green:true,rows:[
+    ['42500','GIFT REVENUE-OPERATING','Private Gift','Revenue','Operating gift revenue received by the university.'],
+    ['46800','REV FR OTHER ACTIVITES-GENERAL','Revenue from Other Educ Act','Revenue','Revenue from other university activities.'],
+    ['40000','TUITION','Tuition and Fees','Revenue','Revenue from student tuition charges.'],
+    ['40500','SCHOOL FEES','Tuition and Fees','Revenue','Revenue from school-specific fees charged to students.'],
+    ['40510','APPLICATION FEES','Tuition and Fees','Revenue','Fees collected from applicants during the admissions process.'],
+  ]},
+  {key:'BalanceSheet',label:'Balance Sheet Accounts',orange:true,rows:[
+    ['11990','PETTY CASH','Petty Cash','Asset','Cash held on hand in petty cash funds.'],
+    ['13000','GOVERNMENT UNBILLED AR','Pledges & Grants Receivable','Asset','Amount owed from government grants not yet billed.'],
+    ['13010','GOVERNMENT BILLED AR','Pledges & Grants Receivable','Asset','Amount billed to a government sponsor but not yet collected.'],
+    ['13020','GOVERNMENT COLLECTED AR','Pledges & Grants Receivable','Asset','Amount received from a government sponsor.'],
+    ['13400','PRIVATE G&C UNBILLED AR','Pledges & Grants Receivable','Asset','Amount owed from private grants not yet billed.'],
+    ['13410','PRIVATE G&C BILLED AR','Pledges & Grants Receivable','Asset','Amount billed to a private sponsor but not yet collected.'],
+    ['13420','PRIVATE G&C COLLECTED AR','Pledges & Grants Receivable','Asset','Amount received from a private sponsor.'],
+    ['13500','INVESTMENT INCOME RECEIVABLE','Cash & Investments','Asset','Investment income earned but not yet received.'],
+    ['13800','STUDENT LOAN RECEIVABLE','Cash & Investments','Asset','Loans owed to the university by students.'],
+    ['17110','PREPAID VOUCHERS FROM AP','Cash & Investments','Asset','Prepaid vouchers recorded through Accounts Payable.'],
+    ['20500','ACCRUED EXPENSES','Liability','Liability','Expenses incurred but not yet paid.'],
+    ['20550','P-CARD LIABILITY','Liability','Liability','Liability for purchases made using procurement cards.'],
+    ['21000','PREPAID TUITION','Liability','Liability','Tuition payments received in advance.'],
+    ['21100','DEFERRED REVENUE','Liability','Liability','Deferred revenue liability.'],
+    ['27900','CONTROLLER PAYROLL LIABILITY','Liability','Liability','Payroll liability held by the controller\'s office.'],
+    ['30000','NET ASSETS','Net Assets','Fund Balance','The university\'s residual financial position after assets and liabilities.'],
+  ]},
+];
+
+// ── VOUCHER TYPE DATA ──
+const VTYPE_DATA={
+  cols:[{key:'code',label:'Voucher Type'},{key:'name',label:'Voucher Type Name'},{key:'def',label:'Description'}],
+  rows:[
+    {code:'0',name:'Fellowship/Scholarship/Stipend',def:'Money given to students like scholarships or stipends'},
+    {code:'1',name:'Foreign Vendor Reimbursements',def:'Paying back a vendor from another country'},
+    {code:'2',name:'Forgivable Loan',def:'A loan that may not have to be paid back'},
+    {code:'3',name:'LRAP-Loan Repayment Assistance',def:'Helping someone pay student loans'},
+    {code:'B',name:'Pay Card',def:'Payment using a pay card'},
+    {code:'C',name:'Check Request',def:'A check issued by the university'},
+    {code:'D',name:'Advance Reconciliation',def:'Settling an advance'},
+    {code:'E',name:'Employee Reimbursement',def:'Paying an employee back for something they bought'},
+    {code:'F',name:'Credit Memo',def:'Reducing a vendor invoice'},
+    {code:'I',name:'Invoice',def:'Paying a vendor invoice'},
+    {code:'O',name:'OGC (Office of General Counsel)',def:'Payment for legal services'},
+    {code:'Q',name:'Prizes and Awards',def:'Prize or award payment'},
+    {code:'R',name:'Refund',def:'Giving money back (refund)'},
+    {code:'W',name:'P-CARD',def:'Purchase made with a P-Card'},
+    {code:'X',name:'Corporate Card',def:'Expense charged to a corporate credit card'},
+    {code:'Y',name:'Columbia Air/Rail Central Pay',def:'Air or rail travel paid through Columbia travel account'},
+    {code:'Z',name:'Visa Application Fees',def:'Visa or immigration fee'},
+  ]
+};
+
+// ── SOURCE DATA ──
+const SRC_DATA={
+  cols:[{key:'code',label:'Source'},{key:'name',label:'Source Name'},{key:'def',label:'Description'}],
+  rows:[
+    {code:'ADA',name:'Advance Clearing Journals',def:'Clearing an advance after expenses were submitted'},
+    {code:'ADB',name:'Advance Bedework Clearing',def:'Clearing an event-related advance'},
+    {code:'ADV',name:'Advance',def:'Money given in advance to cover expected expenses'},
+    {code:'ALL',name:'Allocations',def:'Finance system spreading a cost across multiple accounts'},
+    {code:'AM', name:'Asset Management',def:'Recording equipment purchases or asset activity'},
+    {code:'AP', name:'Accounts Payable',def:'Paying a vendor invoice'},
+    {code:'APA',name:'Accounts Payables Accruals',def:'Recording an invoice before it is paid'},
+    {code:'CNV',name:'Conversion',def:'Data loaded during a system transition or migration'},
+    {code:'COM',name:'Facilities Tririga - Commercial',def:'Facilities or building management charges'},
+    {code:'CON',name:'Consolidations',def:'Finance system combining financial data'},
+    {code:'CSH',name:'FFE Cash Entry Module',def:'Recording a direct cash transaction'},
+    {code:'CTV',name:'Columbia Technology Ventures',def:'Technology licensing or intellectual property revenue/expense'},
+    {code:'EDF',name:'EPIC Daily Financial',def:'Financial data imported from EPIC'},
+    {code:'EMF',name:'EMF Monthly File',def:'Monthly financial data imported from another system'},
+    {code:'ENC',name:'Accrual Encumbrance',def:'Reserving funds for an expected purchase or obligation'},
+    {code:'FIX',name:'Batch Journal Fixes',def:'Correcting accounting errors in a batch of entries'},
+    {code:'FPO',name:'Faculty Practice Org Space Fac',def:'Facilities charges tied to faculty practice operations'},
+    {code:'INV',name:'Kyriba Investment Feed',def:'Investment activity recorded from treasury systems'},
+    {code:'ITF',name:'Internal Transfers',def:'Moving money between Columbia accounts'},
+    {code:'KRN',name:'Kronos',def:'Employee time recorded in Kronos affecting payroll'},
+    {code:'LAB',name:'iLab Transactions',def:'Charges for using shared research labs or equipment'},
+    {code:'MCF',name:'CUMC Facilities Work Orders',def:'Facilities repair or maintenance work order charges'},
+    {code:'MOT',name:'Management Only Transfers',def:'Internal transfers used for management reporting'},
+    {code:'MP2',name:'Facilities MP2',def:'Maintenance work recorded in a facilities system'},
+    {code:'ONL',name:'Online Journal Transactions',def:'Manual journal entry entered by a financial administrator'},
+    {code:'PAY',name:'HRMS',def:'Payroll expense for employee salaries'},
+    {code:'PC', name:'Project Costing',def:'Expense charged to a project or grant'},
+    {code:'PCA',name:'Project Costing Accruals',def:'Recording a project expense before billing occurs'},
+    {code:'RES',name:'Facilities RTMS (Residential)',def:'Housing or residential facility charges'},
+    {code:'RVL',name:'Revaluations',def:'Adjustment due to value changes (investments or currency)'},
+    {code:'SIS',name:'SIS',def:'Student tuition or fee transaction'},
+    {code:'SKI',name:'Skire',def:'Facilities project or construction system charge'},
+    {code:'SPB',name:'Sponsored Project Billing',def:'Billing a sponsor for research project costs'},
+    {code:'SUS',name:'Suspense',def:'Temporary placeholder transaction awaiting correction'},
+    {code:'SVC',name:'Service Corp - Salary',def:'Fringe benefit costs tied to salaries'},
+    {code:'TEL',name:'Telecomm',def:'Phone or telecom service charges'},
+    {code:'TWS',name:'Kyriba Bank Feeds',def:'Bank activity automatically imported into the system'},
+    {code:'YE', name:'Year End Close',def:'Accounting adjustments made during fiscal year close'},
+  ]
+};
+
+// ── COB LINES DATA ──
+const COB_DATA={
+  cols:[{key:'cob',label:'COB Line'},{key:'func',label:'Function'},{key:'fcode',label:'Func Code'},{key:'acct',label:'Account'},{key:'adesc',label:'Account Description'},{key:'proj',label:'Proj Prefix'}],
+  rows:[
+    {cob:'I.A.1.a.',func:'Tuition',fcode:'10',acct:'40000',adesc:'TUITION',proj:'UR'},
+    {cob:'I.A.1.a.',func:'Tuition',fcode:'10',acct:'40095',adesc:'TUITION REV-SEMESTER SPLIT',proj:'UR'},
+    {cob:'I.A.1.b.',func:'Fees',fcode:'20',acct:'40500',adesc:'SCHOOL FEES',proj:'UR'},
+    {cob:'I.A.1.b.',func:'Fees',fcode:'20',acct:'40510',adesc:'APPLICATION FEES',proj:'UR'},
+    {cob:'I.A.1.b.',func:'Fees',fcode:'20',acct:'40540',adesc:'LAB FEES',proj:'UR'},
+    {cob:'I.A.1.b.',func:'Fees',fcode:'20',acct:'40595',adesc:'FEE REVENUE-SEMESTER SPLIT',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61010',adesc:'UNDERGRAD TUIT,FEES,ROOM,BOARD',proj:'EN'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61010',adesc:'UNDERGRAD TUIT,FEES,ROOM,BOARD',proj:'GT'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61010',adesc:'UNDERGRAD TUIT,FEES,ROOM,BOARD',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61030',adesc:'GRADUATE TUITION AND FEES',proj:'EN'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61030',adesc:'GRADUATE TUITION AND FEES',proj:'GG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61030',adesc:'GRADUATE TUITION AND FEES',proj:'GT'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61030',adesc:'GRADUATE TUITION AND FEES',proj:'PG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61030',adesc:'GRADUATE TUITION AND FEES',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61040',adesc:'GRADUATE HEALTH FEES',proj:'EN'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61040',adesc:'GRADUATE HEALTH FEES',proj:'GG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61040',adesc:'GRADUATE HEALTH FEES',proj:'GT'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61040',adesc:'GRADUATE HEALTH FEES',proj:'PG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61040',adesc:'GRADUATE HEALTH FEES',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61043',adesc:'GRADUATE FEES-OTHER',proj:'GG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61043',adesc:'GRADUATE FEES-OTHER',proj:'GT'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61043',adesc:'GRADUATE FEES-OTHER',proj:'PG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61043',adesc:'GRADUATE FEES-OTHER',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61070',adesc:'TRAINEE TUITION AND FEES',proj:'GG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61095',adesc:'FIN AID-SEMESTER SPLIT',proj:'UR'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61099',adesc:'SUMMER FINANCIAL AID BUDGET',proj:'GG'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61099',adesc:'SUMMER FINANCIAL AID BUDGET',proj:'GT'},
+    {cob:'I.A.2.',func:'Less financial aid grants',fcode:'30',acct:'61099',adesc:'SUMMER FINANCIAL AID BUDGET',proj:'UR'},
+    {cob:'I.B.1.',func:"Gov't grants and contracts - direct",fcode:'40',acct:'41000',adesc:'GOVERNMENT REVENUE-DIRECT',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'50',acct:'41100',adesc:'GOVERNMENT REVENUE-F&A',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'50',acct:'41120',adesc:'GOVERNMENT REVENUE-F&A-MAN ADJ',proj:'UR'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'50',acct:'41121',adesc:'GOVT REVENUE F&A - SYS ADJ',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'50',acct:'41121',adesc:'GOVT REVENUE F&A - SYS ADJ',proj:'UR'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'370',acct:'41100',adesc:'GOVERNMENT REVENUE-F&A',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'370',acct:'69810',adesc:'F&A DEDUCTION GOVT ALLOCATION',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'370',acct:'69820',adesc:'F&A DEDUCTION-GOVT MAN ADJ',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'370',acct:'69821',adesc:'F&A DEDUCTION GOVT SYS ADJ',proj:'GG'},
+    {cob:'I.B.2.',func:"Gov't grants and contracts - indirect",fcode:'370',acct:'69840',adesc:'F&A DEDUCTION GOVT ACCRUAL',proj:'GG'},
+    {cob:'I.C.1.',func:'Private Gifts',fcode:'60',acct:'42500',adesc:'GIFT REVENUE-OPERATING',proj:'GT'},
+    {cob:'I.C.1.',func:'Private Gifts',fcode:'60',acct:'42505',adesc:'GIFT REVENUE-PY ADJ-OPERATING',proj:'GT'},
+    {cob:'I.C.1.',func:'Private Gifts',fcode:'60',acct:'42590',adesc:'REFUND TO DONOR-OPERATING',proj:'GT'},
+    {cob:'I.C.1.',func:'Private Gifts',fcode:'60',acct:'42955',adesc:'IBU REV-PRIVATE GIFT',proj:'GT'},
+    {cob:'I.C.2.a.',func:'Private grants and contracts - direct',fcode:'70',acct:'42000',adesc:'PRIVATE G&C REVENUE-DIRECT',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'80',acct:'42100',adesc:'PRIVATE G&C REVENUE-F&A',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'80',acct:'42100',adesc:'PRIVATE G&C REVENUE-F&A',proj:'UR'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'80',acct:'42130',adesc:'PRIVATE G&C REVENUE-F&A-MANADJ',proj:'UR'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'80',acct:'42131',adesc:'PRIVATE G&C REVENUE F&A - SYS',proj:'UR'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'371',acct:'42100',adesc:'PRIVATE G&C REVENUE-F&A',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'371',acct:'69811',adesc:'F&A DEDUCTION PRIV ALLOCATION',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'371',acct:'69830',adesc:'F&A DEDUCTION-PRIV MAN ADJ',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'371',acct:'69831',adesc:'F&A DEDUCTION PRIV SYS ADJ',proj:'PG'},
+    {cob:'I.C.2.b.',func:'Private grants and contracts - indirect',fcode:'371',acct:'69841',adesc:'F&A DEDUCTION PRIV ACCRUAL',proj:'PG'},
+    {cob:'I.D.1.',func:'Other Educ Receipts - Patent & License',fcode:'90',acct:'46020',adesc:'INTERNAL LICENSE REVENUE DISTR',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46200',adesc:'SALARY COST REIMBURSEMENT',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46277',adesc:'IBU REV-OTHER EXPENSES',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46800',adesc:'REV FR OTHER ACTIVITES-GENERAL',proj:'GT'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46800',adesc:'REV FR OTHER ACTIVITES-GENERAL',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46920',adesc:'SUBSCRIPTION REVENUE',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46955',adesc:'MEMBERSHIP INCOME',proj:'UR'},
+    {cob:'I.D.2.',func:'Other Educ Receipts - Other',fcode:'95',acct:'46980',adesc:'EQUIPMENT SALES',proj:'UR'},
+    {cob:'I.F.',func:'Investment Income',fcode:'170',acct:'44000',adesc:'ENDOWMENT INCOME DISTRIBUTED',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'170',acct:'44001',adesc:'ADDITIONAL ENDOW INCOME DISTR',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'170',acct:'44003',adesc:'STABILIZATION ENDOW INC DISTR',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44021',adesc:'ENDOWMENT INCOME SIE',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44070',adesc:'MORTGAGE INCOME',proj:'UR'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44080',adesc:'MISCELLANEOUS INVESTMENT INC',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44093',adesc:'INVESTMENT FEES SIE',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44200',adesc:'INTEREST IN PERP TR INCOME',proj:'EN'},
+    {cob:'I.F.',func:'Investment Income',fcode:'175',acct:'44200',adesc:'INTEREST IN PERP TR INCOME',proj:'GT'},
+    {cob:'II.C.4.',func:'MOT from Transactions',fcode:'633',acct:'70903',adesc:'IS-MOT FROM TRANSACTIONS',proj:'EN'},
+    {cob:'II.C.4.',func:'MOT from Transactions',fcode:'633',acct:'70903',adesc:'IS-MOT FROM TRANSACTIONS',proj:'GT'},
+    {cob:'II.C.4.',func:'MOT from Transactions',fcode:'633',acct:'70903',adesc:'IS-MOT FROM TRANSACTIONS',proj:'UR'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70400',adesc:'IS-GENERAL FUND TRANSFER',proj:'EN'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70400',adesc:'IS-GENERAL FUND TRANSFER',proj:'GT'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70400',adesc:'IS-GENERAL FUND TRANSFER',proj:'UR'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70405',adesc:'IS-INTEREST PAID TO SPONS PROJ',proj:'GG'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70405',adesc:'IS-INTEREST PAID TO SPONS PROJ',proj:'PG'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'70406',adesc:'IS-INTEREST PAID TO SCHOOLS',proj:'UR'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'640',acct:'71002',adesc:'IS-INTERSCHOOL SPACE WET',proj:'UR'},
+    {cob:'II.D.1.',func:'General transfer',fcode:'642',acct:'70410',adesc:'IS-PLANNED OPERATING SUPPORT',proj:'UR'},
+    {cob:'II.D.2.',func:'Surplus transfer',fcode:'644',acct:'70438',adesc:'IS-SPON EXCESS INCOME TRANSFER',proj:'GG'},
+    {cob:'II.D.2.',func:'Surplus transfer',fcode:'644',acct:'70438',adesc:'IS-SPON EXCESS INCOME TRANSFER',proj:'PG'},
+    {cob:'II.D.3.',func:'Overdraft Coverage',fcode:'648',acct:'70435',adesc:'IS-OD COVERAGE-SPON PROJ OD',proj:'GG'},
+    {cob:'II.D.3.',func:'Overdraft Coverage',fcode:'648',acct:'70435',adesc:'IS-OD COVERAGE-SPON PROJ OD',proj:'PG'},
+    {cob:'II.D.3.',func:'Overdraft Coverage',fcode:'648',acct:'70435',adesc:'IS-OD COVERAGE-SPON PROJ OD',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'50010',adesc:'PROF (TENURED)',proj:'EN'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'50010',adesc:'PROF (TENURED)',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'50010',adesc:'PROF (TENURED)',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'52810',adesc:'GRA (SUBJECT TO TUITION)',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'52810',adesc:'GRA (SUBJECT TO TUITION)',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'EN'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'EN'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'EN'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64005',adesc:'SERVICES - GENERAL',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64005',adesc:'SERVICES - GENERAL',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64055',adesc:'CU FACILITIES CHARGEABLE WORK',proj:'EN'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64055',adesc:'CU FACILITIES CHARGEABLE WORK',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64055',adesc:'CU FACILITIES CHARGEABLE WORK',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'UR'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65230',adesc:'DOMESTIC-LODGING',proj:'GT'},
+    {cob:'III.A.1.a.',func:'Instruction and faculty support',fcode:'200',acct:'65230',adesc:'DOMESTIC-LODGING',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'61115',adesc:'UNDERGRADUATE STIPENDS-NONCOMP',proj:'GT'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'61115',adesc:'UNDERGRADUATE STIPENDS-NONCOMP',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'64005',adesc:'SERVICES - GENERAL',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'GT'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'UR'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'GT'},
+    {cob:'III.A.1.b.',func:'Student services',fcode:'205',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'64005',adesc:'SERVICES - GENERAL',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'64005',adesc:'SERVICES - GENERAL',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'66325',adesc:'ADVERTISING',proj:'UR'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'66390',adesc:'PROMOTIONS',proj:'GT'},
+    {cob:'III.A.1.c.',func:'External affairs and fundraising',fcode:'210',acct:'66400',adesc:'ENTERTAINMENT',proj:'GT'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'GT'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'UR'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GT'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'UR'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'64005',adesc:'SERVICES - GENERAL',proj:'UR'},
+    {cob:'III.A.1.d.',func:'General and financial administration',fcode:'215',acct:'64350',adesc:'MEETINGS AND EVENTS',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'225',acct:'50010',adesc:'PROF (TENURED)',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'225',acct:'50010',adesc:'PROF (TENURED)',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'225',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'225',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'230',acct:'50010',adesc:'PROF (TENURED)',proj:'GG'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'230',acct:'50010',adesc:'PROF (TENURED)',proj:'PG'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'230',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GG'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'230',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'PG'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'50010',adesc:'PROF (TENURED)',proj:'EN'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'50010',adesc:'PROF (TENURED)',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'50010',adesc:'PROF (TENURED)',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'52220',adesc:'POSTDOC RESEARCH SCIENTIST-FT',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'52220',adesc:'POSTDOC RESEARCH SCIENTIST-FT',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'GT'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'235',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'UR'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'240',acct:'50010',adesc:'PROF (TENURED)',proj:'GG'},
+    {cob:'III.A.1.g.',func:'Other Instruction & Educ Adm',fcode:'240',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'50010',adesc:'PROF (TENURED)',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'50010',adesc:'PROF (TENURED)',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52050',adesc:'ASSOCIATE RESEARCH SCIENTIST',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52050',adesc:'ASSOCIATE RESEARCH SCIENTIST',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52220',adesc:'POSTDOC RESEARCH SCIENTIST-FT',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52220',adesc:'POSTDOC RESEARCH SCIENTIST-FT',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52810',adesc:'GRA (SUBJECT TO TUITION)',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52810',adesc:'GRA (SUBJECT TO TUITION)',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52820',adesc:'GRA (NO TUITION)',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'52820',adesc:'GRA (NO TUITION)',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'53300',adesc:'OFFICER OF ADMINISTRATION',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61405',adesc:'SUPPLIES AND MATERIALS-GENERAL',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'61500',adesc:'LAB SUPPLIES-GENERAL',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65010',adesc:'SUBCONTRACTS IN MTDC',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65010',adesc:'SUBCONTRACTS IN MTDC',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65020',adesc:'SUBCONTRACTS OUT OF MTDC',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65020',adesc:'SUBCONTRACTS OUT OF MTDC',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65191',adesc:'HUMAN SUBJECT COSTS',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65191',adesc:'HUMAN SUBJECT COSTS',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65220',adesc:'DOMESTIC-MEALS',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65230',adesc:'DOMESTIC-LODGING',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'250',acct:'65230',adesc:'DOMESTIC-LODGING',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'50010',adesc:'PROF (TENURED)',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'50010',adesc:'PROF (TENURED)',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'59010',adesc:'FRINGE BENEFIT CHARGE',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'61140',adesc:'GRADUATE STIPENDS-NONCOMP',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'61140',adesc:'GRADUATE STIPENDS-NONCOMP',proj:'PG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'GG'},
+    {cob:'III.A.2.',func:'Research',fcode:'255',acct:'61160',adesc:'GRA TUITION - DIRECT CHARGE',proj:'PG'},
+    {cob:'III.C.',func:'Operation and maintenance of plant',fcode:'305',acct:'63010',adesc:'RENTAL - FACILITIES',proj:'GG'},
+    {cob:'III.C.',func:'Operation and maintenance of plant',fcode:'305',acct:'63010',adesc:'RENTAL - FACILITIES',proj:'UR'},
+    {cob:'III.C.',func:'Operation and maintenance of plant',fcode:'305',acct:'63025',adesc:'RENTAL - OFFICE',proj:'UR'},
+    {cob:'III.C.',func:'Operation and maintenance of plant',fcode:'305',acct:'67335',adesc:'OFFICE AND BUILDING CLEANING',proj:'UR'},
+    {cob:'III.D.',func:'Institutional Support',fcode:'310',acct:'61230',adesc:'AID TO NONSTUDENTS',proj:'UR'},
+    {cob:'III.D.',func:'Institutional Support',fcode:'310',acct:'64240',adesc:'FEES TO AGENCIES',proj:'UR'},
+    {cob:'III.D.',func:'Institutional Support',fcode:'310',acct:'65210',adesc:'DOMESTIC-TRANSPORTATION',proj:'UR'},
+    {cob:'III.D.',func:'Institutional Support',fcode:'310',acct:'66475',adesc:'TRAVEL - SEGREGATED',proj:'UR'},
+    {cob:'III.F.',func:'Debt Service',fcode:'330',acct:'68510',adesc:'DEBT SERVICE - INTERNAL',proj:'UR'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68010',adesc:'CAPITAL EQUIPMENT-GENERAL',proj:'GG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68010',adesc:'CAPITAL EQUIPMENT-GENERAL',proj:'GT'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68010',adesc:'CAPITAL EQUIPMENT-GENERAL',proj:'PG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68010',adesc:'CAPITAL EQUIPMENT-GENERAL',proj:'UR'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68020',adesc:'CAPITAL SCIENTIFIC EQUIPMENT',proj:'GG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68020',adesc:'CAPITAL SCIENTIFIC EQUIPMENT',proj:'GT'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68020',adesc:'CAPITAL SCIENTIFIC EQUIPMENT',proj:'PG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68020',adesc:'CAPITAL SCIENTIFIC EQUIPMENT',proj:'UR'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68025',adesc:'CAPITAL COMPUTER EQUIPMENT',proj:'GG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68025',adesc:'CAPITAL COMPUTER EQUIPMENT',proj:'GT'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68025',adesc:'CAPITAL COMPUTER EQUIPMENT',proj:'PG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68025',adesc:'CAPITAL COMPUTER EQUIPMENT',proj:'UR'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68100',adesc:'R&D COMPONENT PARTS-CAPITAL',proj:'GG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68100',adesc:'R&D COMPONENT PARTS-CAPITAL',proj:'PG'},
+    {cob:'III.G.',func:'Major Equipment',fcode:'335',acct:'68100',adesc:'R&D COMPONENT PARTS-CAPITAL',proj:'UR'},
+    {cob:'IV.A.1.',func:'Common Cost',fcode:'800',acct:'75100',adesc:'IU-COMMON COST',proj:'UR'},
+    {cob:'IV.A.1.',func:'Common Cost',fcode:'800',acct:'75110',adesc:'IU-AQF CONTRIBUTIONS',proj:'UR'},
+    {cob:'IV.A.1.',func:'Common Cost',fcode:'800',acct:'75120',adesc:'IU-INCREMENTAL UTILITIES',proj:'UR'},
+    {cob:'IV.A.1.',func:'Common Cost',fcode:'800',acct:'75130',adesc:'IU-SITE ACQUISITION RESERVE',proj:'UR'},
+    {cob:'IV.A.1.',func:'Common Cost',fcode:'800',acct:'75170',adesc:'IU-SPACE ASSESSMENT',proj:'UR'},
+    {cob:'IV.C.4.',func:'MOT from Transactions',fcode:'833',acct:'75903',adesc:'IU-MOT FROM TRANSACTIONS',proj:'EN'},
+    {cob:'IV.C.4.',func:'MOT from Transactions',fcode:'833',acct:'75903',adesc:'IU-MOT FROM TRANSACTIONS',proj:'GT'},
+    {cob:'IV.C.4.',func:'MOT from Transactions',fcode:'833',acct:'75903',adesc:'IU-MOT FROM TRANSACTIONS',proj:'UR'},
+    {cob:'IV.C.5.',func:'MOT from Attribute Changes',fcode:'834',acct:'75904',adesc:'IU-MOT FROM ATTRIBUTE CHANGES',proj:'EN'},
+    {cob:'IV.C.5.',func:'MOT from Attribute Changes',fcode:'834',acct:'75904',adesc:'IU-MOT FROM ATTRIBUTE CHANGES',proj:'GT'},
+    {cob:'IV.C.5.',func:'MOT from Attribute Changes',fcode:'834',acct:'75904',adesc:'IU-MOT FROM ATTRIBUTE CHANGES',proj:'UR'},
+    {cob:'IV.D.1.',func:'General transfer',fcode:'840',acct:'75400',adesc:'IU-GENERAL FUND TRANSFER',proj:'EN'},
+    {cob:'IV.D.1.',func:'General transfer',fcode:'840',acct:'75400',adesc:'IU-GENERAL FUND TRANSFER',proj:'GT'},
+    {cob:'IV.D.1.',func:'General transfer',fcode:'840',acct:'75400',adesc:'IU-GENERAL FUND TRANSFER',proj:'UR'},
+    {cob:'IV.D.1.',func:'General transfer',fcode:'840',acct:'76001',adesc:'IU-INTERSCHOOL SPACE DRY',proj:'UR'},
+    {cob:'IV.D.1.',func:'General transfer',fcode:'840',acct:'76002',adesc:'IU-INTERSCHOOL SPACE WET',proj:'UR'},
+    {cob:'IV.D.5.',func:'Capital Campaign transfer',fcode:'852',acct:'75450',adesc:'IU-CAPITAL CAMPAIGN TRANSFER',proj:'UR'},
+    {cob:'V.A.',func:'Transfer from/to Plant',fcode:'680',acct:'74000',adesc:'IS-TRF OPER AND PLANT',proj:'UR'},
+    {cob:'V.A.',func:'Transfer from/to Plant',fcode:'880',acct:'79000',adesc:'IU-TRF OPER AND PLANT',proj:'UR'},
+    {cob:'V.B.',func:'Transfer from/to Endowment',fcode:'682',acct:'74100',adesc:'IS-TRF OPER AND ENDOW PRIN',proj:'GT'},
+    {cob:'V.B.',func:'Transfer from/to Endowment',fcode:'882',acct:'79100',adesc:'IU-TRF OPER AND ENDOW PRIN',proj:'GT'},
+    {cob:'V.B.',func:'Transfer from/to Endowment',fcode:'882',acct:'79100',adesc:'IU-TRF OPER AND ENDOW PRIN',proj:'UR'},
+    {cob:'V.B.',func:'Transfer from/to Endowment',fcode:'882',acct:'79102',adesc:'IU-AUTO RECAPS',proj:'EN'},
+    {cob:'V.B.',func:'Transfer from/to Endowment',fcode:'882',acct:'79103',adesc:'IU-MANUAL RECAPS',proj:'EN'},
+    {cob:'V.D.',func:'Release From Restriction',fcode:'195',acct:'49990',adesc:'RELEASE FROM RESTRICTION',proj:'EN'},
+    {cob:'V.D.',func:'Release From Restriction',fcode:'195',acct:'49990',adesc:'RELEASE FROM RESTRICTION',proj:'GT'},
+    {cob:'V.D.',func:'NonOps Activities',fcode:'509',acct:'48475',adesc:'NONOPERATING RECLASSIFICATIONS',proj:'EN'},
+  ]
+};
+
+const SEG_DATA={
+  cols:[{key:'code',label:'Segment'},{key:'desc',label:'Segment Description'},{key:'def',label:'Definition'}],
+  rows:[
+    {code:'00000000',desc:'Undefined Segment',def:'Undefined Segment'},
+    {code:'52000012',desc:'ENG Prizes/Awards',def:'Funding for prizes and awards.'},
+    {code:'52000016',desc:'ENG Undergraduate - other',def:'Support for undergraduate expenses not otherwise categorized.'},
+    {code:'52000026',desc:'ENG Teaching Lab',def:'Support for teaching lab costs and supplies.'},
+    {code:'52000048',desc:'ENG Student',def:'General student-related support funding.'},
+    {code:'52000069',desc:'ENG Masters',def:"Support for master's program activity."},
+    {code:'52000070',desc:'ENG PHD',def:'Support for PhD program activity.'},
+    {code:'52000071',desc:'ENG Faculty',def:'General faculty-related support funding.'},
+    {code:'52000086',desc:'ENG - Catering',def:'Support for catering-related costs.'},
+    {code:'52000098',desc:'ENG Technology',def:'Support for technology-related expenses.'},
+    {code:'52000102',desc:'ENG Staff Meeting',def:'Funding for staff meeting costs.'},
+    {code:'52000111',desc:'ENG PostDoc',def:'Support for postdoctoral activity.'},
+    {code:'52000117',desc:'ENG ISSO Fees',def:'Support for ISSO fee-related costs.'},
+    {code:'52000121',desc:'ENG Course Assistant',def:'Support for course assistant costs.'},
+    {code:'52000126',desc:'ENG PhD Campus Visits',def:'Support for PhD campus visits.'},
+    {code:'52000128',desc:'ENG Lab refresher',def:'Support for refreshments or supplies for lab activity.'},
+    {code:'52000150',desc:'ENG Faculty Meeting',def:'Funding for faculty meeting costs.'},
+    {code:'52000158',desc:'ENG Dept Chair',def:'Funding for department chair-related activity.'},
+    {code:'52000159',desc:'ENG Dept Vice Chair',def:'Support for department vice chair-related activity.'},
+    {code:'52000167',desc:'ENG Staff General',def:'General staff-related support funding.'},
+    {code:'52000173',desc:'ENG Facilities Fees',def:'Funding for facilities fee-related costs.'},
+    {code:'52000188',desc:'ENG Career Placement & Develop',def:'Support for career placement and development activity.'},
+  ]
+};
+
+// ── INITIATIVE DATA ──
+const INIT_DATA={
+  cols:[{key:'code',label:'Initiative'},{key:'desc',label:'Description'},{key:'def',label:'Definition'}],
+  rows:[
+    {code:'00000',desc:'Undefined Initiative',def:'Undefined Initiative'},
+    {code:'20204',desc:'ENG Memberships & Subscriptions',def:'Support for memberships and subscriptions.'},
+    {code:'29202',desc:'ENG Commencement',def:'Funding for commencement-related expenses.'},
+    {code:'29204',desc:'ENG Faculty Recruitment',def:'Funding for faculty recruitment efforts.'},
+    {code:'29214',desc:'ENG Dept General Operations',def:'General operating funding for departments.'},
+    {code:'29217',desc:'ENG Workshop',def:'Support for workshops and related programming.'},
+    {code:'29223',desc:'ENG Student Recruitment',def:'Funding for student recruitment efforts.'},
+    {code:'40096',desc:'ENG Summer Salary Costs',def:'Funding for summer salary costs.'},
+    {code:'40110',desc:'ENG Student Activities General',def:'General funding for student activities.'},
+    {code:'40511',desc:'ENG Faculty Support - General',def:'General support for faculty-related needs.'},
+    {code:'41802',desc:'ENG Conferences',def:'Support for conferences and related participation costs.'},
+    {code:'41804',desc:'ENG Graduate Activities',def:'Support for graduate student activities.'},
+    {code:'41807',desc:'ENG Symposia',def:'Funding for symposia and related events.'},
+    {code:'41808',desc:'ENG Teaching assistants',def:'Support for teaching assistant costs.'},
+    {code:'41809',desc:'ENG Undergraduate Academic',def:'Funding for undergraduate academic programs.'},
+    {code:'41810',desc:'ENG Undergraduate Activities',def:'Support for undergraduate student activities.'},
+    {code:'41812',desc:'ENG Seminars',def:'Support for seminars and lecture events.'},
+    {code:'41814',desc:'ENG Faculty Discretionary',def:'Faculty discretionary support funding.'},
+    {code:'41815',desc:'ENG Professorships',def:'Support for professorship-related costs.'},
+    {code:'41816',desc:'ENG Fellowship Support',def:'Funding for fellowships and stipend support.'},
+    {code:'41818',desc:'ENG GRA Student Support',def:'Funding for graduate research assistant student support.'},
+    {code:'41821',desc:'ENG Orientation',def:'Support for orientation programming.'},
+    {code:'41822',desc:'ENG Distinguished Lecture',def:'Funding for distinguished lectures.'},
+    {code:'41826',desc:'ENG Student Clubs',def:'Support for student clubs and organizations.'},
+    {code:'41827',desc:'ENG DRA Student Support',def:'Funding for doctoral research assistant student support.'},
+    {code:'60900',desc:'ENG Deans Research Support',def:"Dean's funding for research support."},
+    {code:'60902',desc:'ENG RSP-FRAP',def:'Support for RSP-FRAP-related research activity.'},
+    {code:'60908',desc:'ENG Specific Research',def:'Support for specific research projects or initiatives.'},
+    {code:'60909',desc:'ENG Start-up',def:'Startup funding for faculty research and lab establishment.'},
+    {code:'60958',desc:'ENG Faculty Salary Offsets',def:'Support for faculty salary offset funding.'},
+  ]
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentPage='nat';
+const STATE={
+  nat:{colOrder:[0,1,2,3,4],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+  seg:{colOrder:[0,1,2],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+  init:{colOrder:[0,1,2],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+  vtype:{colOrder:[0,1,2],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+  src:{colOrder:[0,1,2],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+  cob:{colOrder:[0,1,2,3,4,5],colFilters:{},colSort:{col:-1,dir:0},searchQ:''},
+};
+
+// nat cols: 5 columns now (acct#, name, category, type, definition)
+const NAT_COLS=[
+  {key:'num',  label:'Natural Accounts',       w:'100px'},
+  {key:'name', label:'Account Name',           w:'220px'},
+  {key:'cat',  label:'Direct Expense Category',w:'180px'},
+  {key:'type', label:'Account Type',           w:'110px'},
+  {key:'def',  label:'Definition',             w:'auto'},
+];
+
+// ══════════════════════════════════════════════
+// BUILD NAT TABLE
+// ══════════════════════════════════════════════
+function buildNat(){
+  const st=STATE.nat;
+  const cols=st.colOrder.map(i=>NAT_COLS[i]);
+  let allRows=[];
+  NAT_SECTIONS.forEach(sec=>sec.rows.forEach(r=>allRows.push({sec,data:r})));
+
+  const activeCols=Object.keys(st.colFilters).filter(c=>st.colFilters[c]&&st.colFilters[c].length>0);
+  const filtered=activeCols.length||st.searchQ;
+
+  if(filtered){
+    allRows=allRows.filter(({data})=>{
+      if(st.searchQ&&!data.some(v=>v.toLowerCase().includes(st.searchQ)))return false;
+      for(const ci of activeCols){
+        if(!st.colFilters[ci].includes(data[parseInt(ci)]))return false;
+      }
+      return true;
+    });
+    if(st.colSort.col>=0&&st.colSort.dir!==0){
+      const origIdx=st.colOrder[st.colSort.col];
+      allRows.sort((a,b)=>st.colSort.dir*(a.data[origIdx]||'').localeCompare(b.data[origIdx]||''));
+    }
+  }
+
+  const cont=document.getElementById('nat-container');
+  const cg=`<colgroup>${cols.map(c=>`<col style="width:${c.w}">`).join('')}</colgroup>`;
+  const thead=`<thead><tr>${cols.map((c,ci)=>thHtml(c,ci,'nat',st)).join('')}</tr></thead>`;
+  let html=`<div class="tbl-wrap"><table class="itbl">${cg}${thead}<tbody>`;
+
+  if(!filtered){
+    NAT_SECTIONS.forEach(sec=>{
+      const gc=sec.green?' green':sec.orange?' orange':'';
+      html+=`<tr class="row-section${gc}"><td colspan="${cols.length}">${sec.label}</td></tr>`;
+      sec.rows.forEach(r=>{
+        html+=`<tr class="drow">${cols.map(c=>`<td class="cell${c.key==='def'?' def-cell':''}" style="${c.key==='num'?'color:var(--gold);font-weight:700;text-align:center;':c.key==='name'?'font-weight:600;':'text-align:center;'}">${r[colIdx(c.key)]}</td>`).join('')}</tr>`;
+      });
+      html+=`<tr class="row-spacer"><td colspan="${cols.length}"></td></tr>`;
+    });
+    html+=`<tr class="row-warning"><td colspan="${cols.length}">Balance Sheet accounts starting with 1, 2 or 3 are rarely transacted on. Consult the Dean's Office prior to transacting on these accounts.</td></tr>`;
+  } else {
+    if(allRows.length===0){
+      html+=`<tr><td colspan="${cols.length}" style="padding:24px;text-align:center;color:var(--muted);font-style:italic">No accounts match.</td></tr>`;
+    } else {
+      allRows.forEach(({data:r})=>{
+        html+=`<tr class="drow">${cols.map(c=>`<td class="cell${c.key==='def'?' def-cell':''}" style="${c.key==='num'?'color:var(--gold);font-weight:700;text-align:center;':c.key==='name'?'font-weight:600;':'text-align:center;'}">${r[colIdx(c.key)]}</td>`).join('')}</tr>`;
+      });
+    }
+  }
+  html+=`</tbody></table></div>`;
+  cont.innerHTML=html;
+  updateResetHint();
+}
+
+function colIdx(key){return{num:0,name:1,cat:2,type:3,def:4}[key]??0}
+
+// ══════════════════════════════════════════════
+// BUILD CF TABLE (seg / init)
+// ══════════════════════════════════════════════
+function buildCf(pageId){
+  const st=STATE[pageId];
+  const DATA=pageId==='seg'?SEG_DATA:pageId==='init'?INIT_DATA:pageId==='vtype'?VTYPE_DATA:pageId==='src'?SRC_DATA:COB_DATA;
+  const origCols=DATA.cols;
+  const cols=st.colOrder.map(i=>origCols[i]);
+  let rows=[...DATA.rows];
+
+  const activeCols=Object.keys(st.colFilters).filter(c=>st.colFilters[c]&&st.colFilters[c].length>0);
+  if(activeCols.length||st.searchQ){
+    rows=rows.filter(r=>{
+      const vals=Object.values(r).map(v=>v.toLowerCase()).join('|');
+      if(st.searchQ&&!vals.includes(st.searchQ))return false;
+      for(const ci of activeCols){
+        const key=origCols[parseInt(ci)].key;
+        if(!st.colFilters[ci].includes(r[key]))return false;
+      }
+      return true;
+    });
+  }
+  if(st.colSort.col>=0&&st.colSort.dir!==0){
+    const key=origCols[st.colOrder[st.colSort.col]].key;
+    rows.sort((a,b)=>st.colSort.dir*(a[key].localeCompare(b[key])));
+  }
+
+  const cont=document.getElementById(pageId+'-container');
+  const colWidths=pageId==='cob'
+    ?['90px','200px','80px','80px','220px','80px']
+    :['110px','240px','auto'];
+  const cg=`<colgroup>${cols.map((_,i)=>`<col style="width:${colWidths[i]||'auto'}">`).join('')}</colgroup>`;
+  const thead=`<thead><tr>${cols.map((c,ci)=>thHtml(c,ci,pageId,st)).join('')}</tr></thead>`;
+  let html=`<div class="tbl-wrap"><table class="itbl">${cg}${thead}<tbody>`;
+  if(rows.length===0){
+    html+=`<tr><td colspan="${cols.length}" style="padding:24px;text-align:center;color:var(--muted);font-style:italic">No results match.</td></tr>`;
+  } else {
+    rows.forEach(r=>{
+      html+=`<tr class="drow">${cols.map((c,ci)=>{
+        const origI=st.colOrder[ci];
+        const isCode=origI===0;
+        const isAcct=pageId==='cob'&&origI===3;
+        const isBold=origI===1;
+        return `<td class="cell${c.key==='def'?' def-cell':''}" style="${isCode||isAcct?'color:var(--gold);font-weight:700;text-align:center;':isBold?'font-weight:600;':'text-align:center;'}">${r[c.key]}</td>`;
+      }).join('')}</tr>`;
+    });
+  }
+  html+=`</tbody></table></div>`;
+  cont.innerHTML=html;
+  updateResetHint();
+}
+
+// ══════════════════════════════════════════════
+// COLUMN HEADER HTML
+// ══════════════════════════════════════════════
+function thHtml(col,ci,pageId,st){
+  const origIdx=st.colOrder[ci];
+  const hasFilter=st.colFilters[origIdx]&&st.colFilters[origIdx].length>0;
+  const sd=st.colSort.col===ci?st.colSort.dir:0;
+  const si=sd===1?'▲':sd===-1?'▼':'⇅';
+  return `<th class="col-th" draggable="true" data-page="${pageId}" data-ci="${ci}" data-orig="${origIdx}"
+    ondragstart="onDragStart(event)" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragend="onDragEnd(event)">
+    <div class="th-inner" onclick="cycleSort('${pageId}',${ci})">
+      <span class="th-label">${col.label}</span>
+      <span class="th-sort">${si}</span>
+    </div>
+    <button class="th-filter-btn${hasFilter?' has-filter':''}" title="Filter" onclick="event.stopPropagation();toggleDrop('${pageId}',${ci},${origIdx},this)">▾</button>
+    <div class="filter-drop" id="drop-${pageId}-${ci}"></div>
+  </th>`;
+}
+
+// ══════════════════════════════════════════════
+// SORT
+// ══════════════════════════════════════════════
+function cycleSort(pageId,ci){
+  const st=STATE[pageId];
+  if(st.colSort.col===ci){
+    st.colSort.dir=st.colSort.dir===0?1:st.colSort.dir===1?-1:0;
+    if(st.colSort.dir===0)st.colSort.col=-1;
+  } else {st.colSort.col=ci;st.colSort.dir=1}
+  rebuild(pageId);
+}
+
+// ══════════════════════════════════════════════
+// FILTER DROPDOWN
+// ══════════════════════════════════════════════
+let openDrop=null;
+function toggleDrop(pageId,ci,origIdx,btn){
+  const dropId=`drop-${pageId}-${ci}`;
+  const drop=document.getElementById(dropId);
+  if(!drop)return;
+  if(drop.classList.contains('open')){closeDrop();return;}
+  closeDrop();
+  openDrop={id:dropId,btn};
+  btn.classList.add('open');
+
+  const st=STATE[pageId];
+  let vals=[];
+  if(pageId==='nat'){
+    NAT_SECTIONS.forEach(sec=>sec.rows.forEach(r=>{const v=r[origIdx]||'';if(v&&!vals.includes(v))vals.push(v)}));
+  } else {
+    const DATA=pageId==='seg'?SEG_DATA:INIT_DATA;
+    const key=DATA.cols[origIdx].key;
+    DATA.rows.forEach(r=>{if(!vals.includes(r[key]))vals.push(r[key])});
+  }
+  vals.sort();
+
+  const current=st.colFilters[origIdx]||[];
+  const sd=st.colSort.col===ci?st.colSort.dir:0;
+  const listId=`dv-${pageId}-${ci}`;
+
+  drop.innerHTML=`
+    <div class="fd-sort-btns">
+      <button class="fd-sort-btn${sd===1?' active':''}" onclick="setSort('${pageId}',${ci},1)">▲ A→Z</button>
+      <button class="fd-sort-btn${sd===-1?' active':''}" onclick="setSort('${pageId}',${ci},-1)">▼ Z→A</button>
+      <button class="fd-sort-btn${sd===0?' active':''}" onclick="setSort('${pageId}',${ci},0)">— Default</button>
+    </div>
+    <input type="text" placeholder="Search values…" oninput="filterDropVals(this,'${listId}')"/>
+    <div class="fd-opts" id="${listId}">
+      ${vals.map(v=>`<label class="fd-opt"><input type="checkbox" value="${esc2(v)}"${current.includes(v)?' checked':''}><span>${v}</span></label>`).join('')}
+    </div>
+    <div class="fd-actions">
+      <button class="fd-btn apply" onclick="applyDrop('${pageId}',${origIdx},'${listId}')">Apply</button>
+      <button class="fd-btn clear" onclick="clearDrop('${pageId}',${origIdx})">Clear</button>
+    </div>`;
+  drop.classList.add('open');
+}
+function filterDropVals(inp,listId){
+  const q=inp.value.toLowerCase();
+  document.querySelectorAll(`#${listId} .fd-opt`).forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'});
+}
+function applyDrop(pageId,origIdx,listId){
+  const checked=[...document.querySelectorAll(`#${listId} input:checked`)].map(i=>i.value);
+  STATE[pageId].colFilters[origIdx]=checked;
+  closeDrop();rebuild(pageId);
+}
+function clearDrop(pageId,origIdx){
+  STATE[pageId].colFilters[origIdx]=[];
+  closeDrop();rebuild(pageId);
+}
+function setSort(pageId,ci,dir){
+  const st=STATE[pageId];
+  if(dir===0){st.colSort.col=-1;st.colSort.dir=0;}else{st.colSort.col=ci;st.colSort.dir=dir;}
+  closeDrop();rebuild(pageId);
+}
+function closeDrop(){
+  if(openDrop){
+    const d=document.getElementById(openDrop.id);
+    if(d)d.classList.remove('open');
+    if(openDrop.btn)openDrop.btn.classList.remove('open');
+    openDrop=null;
+  }
+}
+document.addEventListener('click',e=>{
+  if(openDrop&&!e.target.closest('.filter-drop')&&!e.target.closest('.th-filter-btn'))closeDrop();
+});
+
+// ══════════════════════════════════════════════
+// DRAG TO REORDER
+// ══════════════════════════════════════════════
+let dragSrc=null;
+function onDragStart(e){dragSrc={ci:parseInt(e.currentTarget.dataset.ci),pageId:e.currentTarget.dataset.page};e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move'}
+function onDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over')}
+function onDrop(e){
+  e.preventDefault();
+  const tci=parseInt(e.currentTarget.dataset.ci),pageId=e.currentTarget.dataset.page;
+  if(dragSrc&&dragSrc.pageId===pageId&&dragSrc.ci!==tci){
+    const st=STATE[pageId],order=[...st.colOrder];
+    const[moved]=order.splice(dragSrc.ci,1);order.splice(tci,0,moved);
+    st.colOrder=order;
+    if(st.colSort.col===dragSrc.ci)st.colSort.col=tci;
+    rebuild(pageId);
+  }
+  e.currentTarget.classList.remove('drag-over');
+}
+function onDragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.col-th').forEach(th=>th.classList.remove('drag-over'))}
+
+// ══════════════════════════════════════════════
+// NAV + FILTER + REBUILD
+// ══════════════════════════════════════════════
+function showPage(id,btn){
+  currentPage=id;
+  document.querySelectorAll('.page-card').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.pnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('searchInput').value='';
+  STATE[id].searchQ='';
+  rebuild(id);
+}
+function filterActive(){
+  STATE[currentPage].searchQ=document.getElementById('searchInput').value.toLowerCase().trim();
+  rebuild(currentPage);
+}
+function rebuild(pageId){
+  if(pageId==='nat')buildNat();else buildCf(pageId);
+}
+function resetAll(){
+  const st=STATE[currentPage];
+  const defaults={nat:[0,1,2,3,4],seg:[0,1,2],init:[0,1,2],vtype:[0,1,2],src:[0,1,2],cob:[0,1,2,3,4,5]};
+  st.colOrder=[...defaults[currentPage]];
+  st.colFilters={};st.colSort={col:-1,dir:0};st.searchQ='';
+  document.getElementById('searchInput').value='';
+  rebuild(currentPage);
+}
+function updateResetHint(){
+  const st=STATE[currentPage];
+  const defaults={nat:[0,1,2,3,4],seg:[0,1,2],init:[0,1,2],vtype:[0,1,2],src:[0,1,2],cob:[0,1,2,3,4,5]};
+  const def=defaults[currentPage]||[0,1,2];
+  const hasF=Object.values(st.colFilters).some(v=>v&&v.length>0);
+  const reord=st.colOrder.some((v,i)=>v!==def[i]);
+  document.getElementById('resetHint').style.display=(hasF||reord||st.colSort.col>=0)?'inline':'none';
+}
+
+function esc2(s){return s.replace(/"/g,'&quot;')}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+buildNat();buildCf('seg');buildCf('init');buildCf('vtype');buildCf('src');buildCf('cob');
+</script>
+</body>
+</html>
